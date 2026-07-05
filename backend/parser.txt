@@ -1,0 +1,49 @@
+import { ParsedIntent } from "./schema";
+
+export async function parseIntent(command: string): Promise<ParsedIntent> {
+  const lower = command.toLowerCase();
+
+  if (lower.includes("send")) {
+    const amountMatch = command.match(/\$?(\d+(\.\d+)?)/);
+    const nameMatch = command.match(/to (\w+)/i);
+    return {
+      action: "send",
+      amount: amountMatch ? `$${amountMatch[1]}` : undefined,
+      recipient: nameMatch ? nameMatch[1] : undefined,
+      summary: `Send ${amountMatch ? `$${amountMatch[1]}` : "funds"} to ${
+        nameMatch ? nameMatch[1] : "recipient"
+      }`,
+    };
+  }
+
+  if (lower.includes("swap")) {
+    return {
+      action: "swap",
+      fromAsset: "USDC",
+      toAsset: "ETH",
+      summary: "Swap USDC for ETH on the cheapest available chain",
+    };
+  }
+
+  if (lower.includes("consolidate")) {
+    return {
+      action: "consolidate",
+      asset: "stablecoins",
+      summary: "Consolidate all stablecoin balances into one Universal Account",
+    };
+  }
+
+  return {
+    action: "unknown",
+    summary: `Could not parse: "${command}"`,
+  };
+}
+
+
+async function callLLM(command: string): Promise<string> {
+  const prompt = `Extract a structured crypto intent (action, amount, asset, recipient) from: "${command}". Respond only with JSON.`;
+
+
+
+  return "{}"; // placeholder
+}

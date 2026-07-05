@@ -1,0 +1,31 @@
+import express from "express";
+import cors from "cors";
+import { parseIntent } from "./intent/parser";
+import { executeIntent } from "./execution/universalAccount";
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+app.post("/api/parse", async (req, res) => {
+  const { command } = req.body;
+  if (!command) {
+    return res.status(400).json({ error: "Missing 'command' in request body" });
+  }
+  const intent = await parseIntent(command);
+  res.json(intent);
+});
+
+app.post("/api/execute", async (req, res) => {
+  const { intent } = req.body;
+  if (!intent) {
+    return res.status(400).json({ error: "Missing 'intent' in request body" });
+  }
+  const result = await executeIntent(intent);
+  res.json(result);
+});
+
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+  console.log(`Sayso backend running on http://localhost:${PORT}`);
+});
