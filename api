@@ -1,3 +1,4 @@
+#demo file(without actual api)
 export type ParsedIntent = {
   action: "send" | "swap" | "consolidate" | "unknown";
   amount?: string;
