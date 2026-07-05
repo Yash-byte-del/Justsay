@@ -1,0 +1,47 @@
+export type ParsedIntent = {
+  action: "send" | "swap" | "consolidate" | "unknown";
+  amount?: string;
+  asset?: string;
+  recipient?: string;
+  summary: string;
+};
+
+export async function parseIntent(command: string): Promise<ParsedIntent> {
+  await new Promise((resolve) => setTimeout(resolve, 400)); // simulate latency
+
+  const lower = command.toLowerCase();
+
+  if (lower.includes("send")) {
+    const amountMatch = command.match(/\$?(\d+(\.\d+)?)/);
+    const nameMatch = command.match(/to (\w+)/i);
+    return {
+      action: "send",
+      amount: amountMatch ? `$${amountMatch[1]}` : undefined,
+      recipient: nameMatch ? nameMatch[1] : undefined,
+      summary: `Send ${amountMatch ? `$${amountMatch[1]}` : "funds"} to ${
+        nameMatch ? nameMatch[1] : "recipient"
+      }`,
+    };
+  }
+
+  if (lower.includes("swap")) {
+    return {
+      action: "swap",
+      asset: "USDC → ETH",
+      summary: "Swap USDC for ETH on the cheapest available chain",
+    };
+  }
+
+  if (lower.includes("consolidate")) {
+    return {
+      action: "consolidate",
+      asset: "Stablecoins",
+      summary: "Consolidate all stablecoin balances into one Universal Account",
+    };
+  }
+
+  return {
+    action: "unknown",
+    summary: `Could not parse: "${command}"`,
+  };
+}
